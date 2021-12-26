@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  bot:
+    image: infrays:dev
+    build: 
+      context: .
+      dockerfile: DOCKERFILE
