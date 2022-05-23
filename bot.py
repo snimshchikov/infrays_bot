@@ -14,9 +14,7 @@ from telegram.ext import CallbackContext
 from random import randint
 
 replies = ["Ты что реально на это подписан?",
-            "Не пости либертоду, не позорься.",
-            "Миша Светов трахнул шкетов.",
-            "СВТВ? Просто продай мать сразу пожалуйста."]
+           "Не пости либертоду, не позорься."]
 
 from telegram.ext import MessageHandler, Filters
 def chat_sender_handler(update: Update, context: CallbackContext):
