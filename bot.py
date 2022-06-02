@@ -71,7 +71,7 @@ def chat_sender_handler(update: Update, context: CallbackContext):
             if Timer('label0').check():
                 context.bot.send_message(chat_id=update.effective_chat.id, text=f"{mention} "+replies[randint(0,len(replies)-1)])
     elif message.text:
-        if 'twitter.com/svtv_news' in message.text:
+        if 'twitter.com/svtv_news' in message.text or 'svtv.org' in message.text:
             context.bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
             if Timer('label1').check():
                 context.bot.send_message(chat_id=update.effective_chat.id, text=f"{mention} "+replies[randint(0,len(replies)-1)])
