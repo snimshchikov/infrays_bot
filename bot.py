@@ -1,5 +1,5 @@
 from telegram.ext import Updater
-prod = False
+prod = True
 if prod:
     from secret import token
     updater = Updater(token=token, use_context=True)
