@@ -1,21 +1,16 @@
-from telegram.ext import Updater
-prod = True
-if prod:
-    from secret import token
-    updater = Updater(token=token, use_context=True)
-else:
-    updater = Updater(token="2108324100:AAGXQWr1qD4VmJl4qpBV7YGuz5ilHlAkgHs", use_context=True)
-
-dispatcher = updater.dispatcher
-
+from random import randint
 import logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                      level=logging.INFO)
 
-from telegram import Update
-from telegram.ext import CallbackContext
+from aiogram import Bot, Dispatcher, executor, types
 
-from random import randint
+from db import DB
+
+bot = Bot(token='TOKEN')
+dp = Dispatcher(bot)
+
+db = DB("./bot.db")
 
 replies = ["Ты что реально на это подписан?",
            "Не пости либертоду, не позорься."]
@@ -42,49 +37,51 @@ class Timer():
             return True
         return False
 
-from telegram.ext import MessageHandler, Filters
-def chat_sender_handler(update: Update, context: CallbackContext):
-    message = update.message
+@dp.message_handler()
+async def chat_sender_handler(message: types.Message):
     if message is None:
         return
     sender = message.from_user
 
+    first_last_names = ""
+    if sender.first_name:
+        first_last_names+=sender.first_name
+    if sender.last_name:
+        first_last_names+=' '+sender.last_name
+    first_last_names = first_last_names.strip()
     # mention generation
     if sender is not None:
         mention = sender.username
         if mention is None:
-            mention = ''
-            if sender.first_name:
-                mention+=sender.first_name
-            if sender.last_name:
-                mention+=' '+sender.last_name
-            mention = mention.strip()
+            mention = first_last_names
         else:
             mention = "@"+mention
+    if message.chat.id == -1001176998310:
+        await db.add_count(sender.id, first_last_names)
 
     if message.sender_chat:
-        context.bot.ban_chat_sender_chat(chat_id=update.effective_chat.id, sender_chat_id=message.sender_chat.id)
-        context.bot.send_message(chat_id=update.effective_chat.id, text=f"Забанил новый канал Имя: {message.sender_chat.title} - Тег: {message.sender_chat.username}!")
+        await bot.ban_chat_sender_chat(chat_id=message.chat.id, sender_chat_id=message.sender_chat.id)
+        await bot.send_message(chat_id=message.chat.id, text=f"Забанил новый канал Имя: {message.sender_chat.title} - Тег: {message.sender_chat.username}!")
     elif message.forward_from_chat:
         if message.forward_from_chat.id in (-1001522560514,-1001513669961):
-            context.bot.deleteMessage(chat_id=update.message.chat.id, message_id=update.message.message_id)
+            await message.delete()
             if Timer('label0').check():
-                context.bot.send_message(chat_id=update.effective_chat.id, text=f"{mention} "+replies[randint(0,len(replies)-1)])
+                await bot.send_message(chat_id=message.chat.id, text=f"{mention} "+replies[randint(0,len(replies)-1)])
     elif message.text:
+        lower_text = message.text.lower()
         if 'twitter.com/svtv_news' in message.text or 'svtv.org' in message.text:
-            context.bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
+            await message.delete()
             if Timer('label1').check():
-                context.bot.send_message(chat_id=update.effective_chat.id, text=f"{mention} "+replies[randint(0,len(replies)-1)])
-        elif "либерт" in message.text.lower():
+                await bot.send_message(chat_id=message.chat.id, text=f"{mention} "+replies[randint(0,len(replies)-1)])
+        elif "либерт" in lower_text:
             if Timer('label2').check():
-                context.bot.send_message(reply_to_message_id=message.message_id, chat_id=update.effective_chat.id, text="Вы упомянули либертарианство. Если вы либертарианец, то вас принудительно вакцинируют.")
-        elif "светов" in message.text.lower():
+                await message.answer(text="Вы упомянули либертарианство. Если вы либертарианец, то вас принудительно вакцинируют.")
+        elif "светов" in lower_text:
             if Timer('label3').check():
-                context.bot.send_message(reply_to_message_id=message.message_id, chat_id=update.effective_chat.id, text="Вы упомянули Светова.... Зачем?")
-        elif "трансгум" in message.text.lower() or "трансгум" in message.text.lower():
+                await message.answer(text="Вы упомянули Светова.... Зачем?")
+        elif "трансгум" in lower_text or "трансгум" in lower_text:
             if Timer('label4').check():
-                context.bot.send_message(reply_to_message_id=message.message_id, chat_id=update.effective_chat.id, text=tg_replies[randint(0,len(tg_replies)-1)])
-dispatcher.add_handler(MessageHandler(Filters.update, chat_sender_handler))
+                await message.answer(text=tg_replies[randint(0,len(tg_replies)-1)])
 
-
-updater.start_polling()
+if __name__ == '__main__':
+    executor.start_polling(dp, skip_updates=True)
