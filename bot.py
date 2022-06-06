@@ -6,8 +6,9 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 from aiogram import Bot, Dispatcher, executor, types
 
 from db import DB
+from secret import TOKEN
 
-bot = Bot(token='897693949:AAFV8PKUS5Z60ytng8JZ7XFeHg6JuTQUwmQ')
+bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
 
 db = DB("./bot.db")
@@ -62,12 +63,12 @@ async def chat_sender_handler(message: types.Message):
     if message.sender_chat:
         await bot.ban_chat_sender_chat(chat_id=message.chat.id, sender_chat_id=message.sender_chat.id)
         await bot.send_message(chat_id=message.chat.id, text=f"Забанил новый канал Имя: {message.sender_chat.title} - Тег: {message.sender_chat.username}!")
-    elif message.forward_from_chat:
+    elif message.forward_from_chat and message.chat.id == -1001176998310:
         if message.forward_from_chat.id in (-1001522560514,-1001513669961):
             await message.delete()
             if Timer('label0').check():
                 await bot.send_message(chat_id=message.chat.id, text=f"{mention} "+replies[randint(0,len(replies)-1)])
-    elif message.text:
+    elif message.text and message.chat.id == -1001176998310:
         lower_text = message.text.lower()
         if 'twitter.com/svtv_news' in message.text or 'svtv.org' in message.text:
             await message.delete()
