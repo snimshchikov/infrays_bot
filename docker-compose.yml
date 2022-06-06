@@ -6,3 +6,5 @@ services:
     build: 
       context: .
       dockerfile: DOCKERFILE
+    volumes:
+    - ./db:/db
