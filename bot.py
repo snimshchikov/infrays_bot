@@ -7,7 +7,7 @@ from aiogram import Bot, Dispatcher, executor, types
 
 from db import DB
 
-bot = Bot(token='TOKEN')
+bot = Bot(token='897693949:AAFV8PKUS5Z60ytng8JZ7XFeHg6JuTQUwmQ')
 dp = Dispatcher(bot)
 
 db = DB("./bot.db")
@@ -82,6 +82,13 @@ async def chat_sender_handler(message: types.Message):
         elif "трансгум" in lower_text or "трансгум" in lower_text:
             if Timer('label4').check():
                 await message.answer(text=tg_replies[randint(0,len(tg_replies)-1)])
+        elif "иноаг" in lower_text and not message.forward_from_chat:
+            if Timer('label5').check():
+                await message.answer(text=
+                    "ДАННОЕ СООБЩЕНИЕ (МАТЕРИАЛ) СОЗДАНО И (ИЛИ) РАСПРОСТРАНЕНО ИНОСТРАННЫМ СРЕДСТВОМ МАССОВОЙ "+\
+                    "ИНФОРМАЦИИ, ВЫПОЛНЯЮЩИМ ФУНКЦИИ ИНОСТРАННОГО АГЕНТА, И (ИЛИ) РОССИЙСКИМ ЮРИДИЧЕСКИМ ЛИЦОМ, "+\
+                    "ВЫПОЛНЯЮЩИМ ФУНКЦИИ ИНОСТРАННОГО АГЕНТА"
+                )
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
