@@ -11,7 +11,7 @@ from secret import TOKEN
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
 
-db = DB("./bot.db")
+db = DB("/db/bot.db")
 
 replies = ["Ты что реально на это подписан?",
            "Не пости либертоду, не позорься."]
