@@ -15,7 +15,6 @@ class DB():
         self.cnt = 0
 
     async def add_count(self, user_id, mention):
-        print(mention)
         if self.cnt==5:
             async with aiosqlite.connect(self.path) as db:
                 await db.execute(

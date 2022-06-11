@@ -1,4 +1,5 @@
 from random import randint
+import os
 import logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                      level=logging.INFO)
@@ -11,10 +12,12 @@ from secret import TOKEN
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
 
-db = DB("/db/bot.db")
+db = DB(os.path.join('.','db','bot.db'))
 
 replies = ["Ты что реально на это подписан?",
            "Не пости либертоду, не позорься."]
+
+legion_replies = ["Новости Легиона, остаются в канале Легиона."]
 
 tg_replies = ['Вы упомянули трансгуманизм. Вы Артём Александров?', 
             'Вы упомянули трансгуманизм. Попробуйте писать сообщения короче.']
@@ -57,39 +60,42 @@ async def chat_sender_handler(message: types.Message):
             mention = first_last_names
         else:
             mention = "@"+mention
-    if message.chat.id == -1001176998310:
+    if message.chat.id in {-1001176998310,-1001154772762}: #ID OF KATZBOTS and TEST CHANNEL
         await db.add_count(sender.id, first_last_names)
 
     if message.sender_chat:
         await bot.ban_chat_sender_chat(chat_id=message.chat.id, sender_chat_id=message.sender_chat.id)
         await bot.send_message(chat_id=message.chat.id, text=f"Забанил новый канал Имя: {message.sender_chat.title} - Тег: {message.sender_chat.username}!")
-    elif message.forward_from_chat and message.chat.id == -1001176998310:
-        if message.forward_from_chat.id in (-1001522560514,-1001513669961):
+    elif message.forward_from_chat and message.chat.id in {-1001176998310,-1001154772762}:
+        if message.forward_from_chat.id in {-1001522560514,-1001513669961}: # SVTV news and I don't know what else
             await message.delete()
             if Timer('label0').check():
                 await bot.send_message(chat_id=message.chat.id, text=f"{mention} "+replies[randint(0,len(replies)-1)])
-    elif message.text and message.chat.id == -1001176998310:
-        lower_text = message.text.lower()
-        if 'twitter.com/svtv_news' in message.text or 'svtv.org' in message.text:
+        elif message.forward_from_chat.id in {-1001227769643,}: # legion id
             await message.delete()
-            if Timer('label1').check():
-                await bot.send_message(chat_id=message.chat.id, text=f"{mention} "+replies[randint(0,len(replies)-1)])
-        elif "либерт" in lower_text:
-            if Timer('label2').check():
-                await message.answer(text="Вы упомянули либертарианство. Если вы либертарианец, то вас принудительно вакцинируют.")
-        elif "светов" in lower_text:
-            if Timer('label3').check():
-                await message.answer(text="Вы упомянули Светова.... Зачем?")
-        elif "трансгум" in lower_text or "трансгум" in lower_text:
-            if Timer('label4').check():
-                await message.answer(text=tg_replies[randint(0,len(tg_replies)-1)])
-        elif "иноаг" in lower_text and not message.forward_from_chat:
-            if Timer('label5').check():
-                await message.answer(text=
-                    "ДАННОЕ СООБЩЕНИЕ (МАТЕРИАЛ) СОЗДАНО И (ИЛИ) РАСПРОСТРАНЕНО ИНОСТРАННЫМ СРЕДСТВОМ МАССОВОЙ "+\
-                    "ИНФОРМАЦИИ, ВЫПОЛНЯЮЩИМ ФУНКЦИИ ИНОСТРАННОГО АГЕНТА, И (ИЛИ) РОССИЙСКИМ ЮРИДИЧЕСКИМ ЛИЦОМ, "+\
-                    "ВЫПОЛНЯЮЩИМ ФУНКЦИИ ИНОСТРАННОГО АГЕНТА"
-                )
-
+            if Timer('label_legion').check():
+                await bot.send_message(chat_id=message.chat.id, text=f"{mention} "+legion_replies[randint(0,len(legion_replies)-1)])
+        elif message.text and message.chat.id in {-1001176998310,-1001154772762}:
+            lower_text = message.text.lower()
+            if 'twitter.com/svtv_news' in message.text or 'svtv.org' in message.text:
+                await message.delete()
+                if Timer('label1').check():
+                    await bot.send_message(chat_id=message.chat.id, text=f"{mention} "+replies[randint(0,len(replies)-1)])
+            elif "либерт" in lower_text:
+                if Timer('label2').check():
+                    await message.answer(text="Вы упомянули либертарианство. Если вы либертарианец, то вас принудительно вакцинируют.")
+            elif "светов" in lower_text:
+                if Timer('label3').check():
+                    await message.answer(text="Вы упомянули Светова.... Зачем?")
+            elif "трансгум" in lower_text or "трансгум" in lower_text:
+                if Timer('label4').check():
+                    await message.answer(text=tg_replies[randint(0,len(tg_replies)-1)])
+            elif "иноаг" in lower_text and not message.forward_from_chat:
+                if Timer('label5').check():
+                    await message.answer(text=
+                        "ДАННОЕ СООБЩЕНИЕ (МАТЕРИАЛ) СОЗДАНО И (ИЛИ) РАСПРОСТРАНЕНО ИНОСТРАННЫМ СРЕДСТВОМ МАССОВОЙ "+\
+                        "ИНФОРМАЦИИ, ВЫПОЛНЯЮЩИМ ФУНКЦИИ ИНОСТРАННОГО АГЕНТА, И (ИЛИ) РОССИЙСКИМ ЮРИДИЧЕСКИМ ЛИЦОМ, "+\
+                        "ВЫПОЛНЯЮЩИМ ФУНКЦИИ ИНОСТРАННОГО АГЕНТА"
+                    )
 if __name__ == '__main__':
-    executor.start_polling(dp, skip_updates=True)
+    executor.start_polling(dp)
