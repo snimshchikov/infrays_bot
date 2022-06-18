@@ -40,7 +40,28 @@ class Timer():
             self.last_invoked = datetime.now()
             return True
         return False
-
+swears = [
+    "говно",
+    "залупа",
+    "отрыжка пидораса",
+    "хер",
+    "пидор",
+    "да.\nПизда",
+    "хуй",
+    "малафья",
+    "Анус Потрепидзе",
+    "днище ебаное",
+    "светист ебаный",
+    "дочка конееба",
+    "овощ гнилой",
+]
+prefix_swears = [
+    "Алгоритмы подсказали, что ты ",
+    "Ты кстати ",
+    "Миру мир, а ты ",
+    "В огороде бузина, а ты ",
+    "Сейчас я вам покажу откуда на Беларусь готовилось нападение. И если бы не ты ",
+]
 @dp.message_handler()
 async def chat_sender_handler(message: types.Message):
     if message is None:
@@ -75,27 +96,29 @@ async def chat_sender_handler(message: types.Message):
             await message.delete()
             if Timer('label_legion').check():
                 await bot.send_message(chat_id=message.chat.id, text=f"{mention} "+legion_replies[randint(0,len(legion_replies)-1)])
-        elif message.text and message.chat.id in {-1001176998310,-1001154772762}:
-            lower_text = message.text.lower()
-            if 'twitter.com/svtv_news' in message.text or 'svtv.org' in message.text:
-                await message.delete()
-                if Timer('label1').check():
-                    await bot.send_message(chat_id=message.chat.id, text=f"{mention} "+replies[randint(0,len(replies)-1)])
-            elif "либерт" in lower_text:
-                if Timer('label2').check():
-                    await message.answer(text="Вы упомянули либертарианство. Если вы либертарианец, то вас принудительно вакцинируют.")
-            elif "светов" in lower_text:
-                if Timer('label3').check():
-                    await message.answer(text="Вы упомянули Светова.... Зачем?")
-            elif "трансгум" in lower_text or "трансгум" in lower_text:
-                if Timer('label4').check():
-                    await message.answer(text=tg_replies[randint(0,len(tg_replies)-1)])
-            elif "иноаг" in lower_text and not message.forward_from_chat:
-                if Timer('label5').check():
-                    await message.answer(text=
-                        "ДАННОЕ СООБЩЕНИЕ (МАТЕРИАЛ) СОЗДАНО И (ИЛИ) РАСПРОСТРАНЕНО ИНОСТРАННЫМ СРЕДСТВОМ МАССОВОЙ "+\
-                        "ИНФОРМАЦИИ, ВЫПОЛНЯЮЩИМ ФУНКЦИИ ИНОСТРАННОГО АГЕНТА, И (ИЛИ) РОССИЙСКИМ ЮРИДИЧЕСКИМ ЛИЦОМ, "+\
-                        "ВЫПОЛНЯЮЩИМ ФУНКЦИИ ИНОСТРАННОГО АГЕНТА"
-                    )
+    elif message.text and message.chat.id in {-1001176998310,-1001154772762}:
+        if randint(0,10)==1:
+            await message.reply(text=prefix_swears[randint(0,len(prefix_swears)-1)]+swears[randint(0,len(swears)-1)]+' 😉')
+        lower_text = message.text.lower()
+        if 'twitter.com/svtv_news' in lower_text or 'svtv.org' in lower_text:
+            await message.delete()
+            if Timer('label1').check():
+                await bot.send_message(chat_id=message.chat.id, text=f"{mention} "+replies[randint(0,len(replies)-1)])
+        elif "либерт" in lower_text:
+            if Timer('label2').check():
+                await message.reply(text="Вы упомянули либертарианство. Если вы либертарианец, то вас принудительно вакцинируют.")
+        elif "светов" in lower_text:
+            if Timer('label3').check():
+                await message.reply(text="Вы упомянули Светова.... Зачем?")
+        elif "трансгум" in lower_text or "трансгум" in lower_text:
+            if Timer('label4').check():
+                await message.reply(text=tg_replies[randint(0,len(tg_replies)-1)])
+        elif "иноаг" in lower_text and not message.forward_from_chat:
+            if Timer('label5').check():
+                await message.reply(text=
+                    "ДАННОЕ СООБЩЕНИЕ (МАТЕРИАЛ) СОЗДАНО И (ИЛИ) РАСПРОСТРАНЕНО ИНОСТРАННЫМ СРЕДСТВОМ МАССОВОЙ "+\
+                    "ИНФОРМАЦИИ, ВЫПОЛНЯЮЩИМ ФУНКЦИИ ИНОСТРАННОГО АГЕНТА, И (ИЛИ) РОССИЙСКИМ ЮРИДИЧЕСКИМ ЛИЦОМ, "+\
+                    "ВЫПОЛНЯЮЩИМ ФУНКЦИИ ИНОСТРАННОГО АГЕНТА"
+                )
 if __name__ == '__main__':
     executor.start_polling(dp)
