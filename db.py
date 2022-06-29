@@ -15,25 +15,25 @@ class DB():
         self.cnt = 0
 
     async def add_count(self, user_id, mention):
-        if self.cnt==5:
-            async with aiosqlite.connect(self.path) as db:
-                await db.execute(
-                    f"""
-                        CREATE TABLE message_counter_tmp AS
-                        SELECT message_counter.user_id, last_.last_user_name, SUM(message_count) as message_count
-                        FROM message_counter
-						JOIN (SELECT user_id, last_user_name FROM(
-                            SELECT user_id, last_user_name, ROW_NUMBER() OVER(PARTITION BY user_id ORDER BY ROWID DESC) as rn 
-                            FROM message_counter)
-							where rn=1) as last_
-						ON last_.user_id = message_counter.user_id
-                        GROUP BY message_counter.user_id
-                    """
-                )
-                await db.execute("DROP TABLE message_counter")
-                await db.execute("ALTER TABLE message_counter_tmp RENAME TO message_counter;")
-                await db.commit()
-            self.cnt = 0
+        # if self.cnt==5:
+        #     async with aiosqlite.connect(self.path) as db:
+        #         await db.execute(
+        #             f"""
+        #                 CREATE TABLE message_counter_tmp AS
+        #                 SELECT message_counter.user_id, last_.last_user_name, SUM(message_count) as message_count
+        #                 FROM message_counter
+		# 				JOIN (SELECT user_id, last_user_name FROM(
+        #                     SELECT user_id, last_user_name, ROW_NUMBER() OVER(PARTITION BY user_id ORDER BY ROWID DESC) as rn 
+        #                     FROM message_counter)
+		# 					where rn=1) as last_
+		# 				ON last_.user_id = message_counter.user_id
+        #                 GROUP BY message_counter.user_id
+        #             """
+        #         )
+        #         await db.execute("DROP TABLE message_counter")
+        #         await db.execute("ALTER TABLE message_counter_tmp RENAME TO message_counter;")
+        #         await db.commit()
+        #     self.cnt = 0
         async with aiosqlite.connect(self.path) as db:
             await db.execute(
                 f"""
@@ -42,5 +42,5 @@ class DB():
                 """
             )
             await db.commit()
-        self.cnt+=1
+        #self.cnt+=1
     
