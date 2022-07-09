@@ -4,7 +4,7 @@ import os
 
 class DB():
     creates = """
-        CREATE TABLE message_counter (user_id INT, last_user_name STRING, message_count INT)
+        CREATE TABLE message_counter (user_id INT, last_user_name STRING, message_count INTEGER, timestamp INTEGER, message_text STRING)
     """
     def __init__(self, path):
         if not os.path.exists(path):
@@ -14,7 +14,7 @@ class DB():
         self.path = path
         self.cnt = 0
 
-    async def add_count(self, user_id, mention):
+    async def add_message(self, user_id, mention, timestamp, message_text):
         # if self.cnt==5:
         #     async with aiosqlite.connect(self.path) as db:
         #         await db.execute(
@@ -37,8 +37,8 @@ class DB():
         async with aiosqlite.connect(self.path) as db:
             await db.execute(
                 f"""
-                    INSERT INTO message_counter (user_id, last_user_name, message_count)
-                    VALUES ({user_id}, '{mention}', 1)
+                    INSERT INTO message_counter (user_id, last_user_name, timestamp, message_text)
+                    VALUES ({user_id}, '{mention}', {timestamp}, '{message_text}')
                 """
             )
             await db.commit()
