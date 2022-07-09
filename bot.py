@@ -96,7 +96,7 @@ async def chat_sender_handler(message: types.Message):
             if Timer('label_legion').check():
                 await bot.send_message(chat_id=message.chat.id, text=f"{mention} "+legion_replies[randint(0,len(legion_replies)-1)])
     elif message.text and message.chat.id in {-1001176998310,-1001154772762}:
-        if randint(0,20)==1:
+        if randint(0,40)==1:
             await message.reply(text=prefix_swears[randint(0,len(prefix_swears)-1)]+swears[randint(0,len(swears)-1)]+' 😉')
         lower_text = message.text.lower()
         if 'twitter.com/svtv_news' in lower_text or 'svtv.org' in lower_text:
